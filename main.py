@@ -55,4 +55,4 @@ if __name__ == "__main__":
         I made a video covering their latest blog post.
         """)
     response = graph.invoke(inputs)
-    print("This is the response",response)
+    print("This is the response",response[1].content)
