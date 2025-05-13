@@ -1,40 +1,10 @@
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_community.chat_models import ChatOllama  # open-source model interface
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
-from langchain.llms import Ollama
+from langchain_ollama import OllamaLLM
+from langchain_core.prompts import PromptTemplate
 
+# Instantiate the model
+llm = OllamaLLM(model="mistral")
 
-# # Define prompts
-# reflection_prompt = ChatPromptTemplate.from_messages(
-#     [
-#         (
-#             "system",
-#             "You are a viral twitter influencer grading a tweet. Generate critique and recommendations for the user's tweet. "
-#             "Always provide detailed recommendations, including requests for length, virality, style, etc.",
-#         ),
-#         MessagesPlaceholder(variable_name="messages"),
-#     ]
-# )
-
-# generation_prompt = ChatPromptTemplate.from_messages(
-#     [
-#         (
-#             "system",
-#             "You are a twitter techie influencer assistant tasked with writing excellent twitter posts. "
-#             "Generate the best twitter post possible for the user's request. "
-#             "If the user provides critique, respond with a revised version of your previous attempts.",
-#         ),
-#         MessagesPlaceholder(variable_name="messages"),
-#     ]
-# )
-
-# # Use an open-source LLM via Ollama (e.g., llama3, mistral, etc.)
-# llm = ChatOllama(model="tinyllama") # Make sure Ollama is running and the model is available
-
-# Use your desired model
-llm = Ollama(model="mistral")
-
+# Prompt for blog generation
 generate_prompt = PromptTemplate.from_template("""
 You are a professional blog writer. Rewrite the blog post to follow this structure:
 
@@ -49,13 +19,15 @@ Improve clarity, flow, grammar, and engagement.
 BLOG DRAFT:
 {messages}
 """)
+
+# Prompt for blog reflection/refinement
 reflect_prompt = PromptTemplate.from_template("""
 Review the improved blog post and suggest a refinement or better phrasing if needed.
 
 BLOG POST:
 {messages}
 """)
-# Define chains
 
-generate_chain = LLMChain(llm=llm, prompt=generate_prompt)
-reflect_chain = LLMChain(llm=llm, prompt=reflect_prompt)
+# Define chains as runnable sequences
+generate_chain = generate_prompt | llm
+reflect_chain = reflect_prompt | llm
